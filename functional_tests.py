@@ -1,3 +1,6 @@
+#
+#  Copyright (C) 2016 David Brookshire <dave@brookshire.org>
+#
 import unittest
 
 from selenium import webdriver

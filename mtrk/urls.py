@@ -1,3 +1,6 @@
+#
+#  Copyright (C) 2016 David Brookshire <dave@brookshire.org>
+#
 """mtrk URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:

@@ -1,3 +1,6 @@
+#
+#  Copyright (C) 2016 David Brookshire <dave@brookshire.org>
+#
 from django.test import TestCase
 
 from django.core.urlresolvers import resolve
