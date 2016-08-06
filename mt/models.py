@@ -18,13 +18,18 @@ class MovieAsset(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.title + " (" + self.barcode + ")"
+        return self.title
 
     @property
     def status(self):
+        """
+        Determine the current state of this asset based on transaction records.
+        :return: The last transaction's code, or unknown if no transactions have been recorded.
+        """
         records = AssetTransaction.objects.all()
-        if len(records) > 0:
-            return records[0].trans
+        record_count = len(records)
+        if record_count > 0:
+            return records[record_count-1].trans
         else:
             return AssetTransaction.UNKNOWN
 
@@ -33,27 +38,54 @@ class MovieAsset(models.Model):
         idx, desc = AssetTransaction.TRANSACTION_CHOICES[self.status]
         return desc
 
+    def transaction(self, trans, note=None):
+        tr = AssetTransaction.objects.create(asset=self,
+                                             trans=trans,
+                                             note=note)
+        return tr
+
+    def check_in(self):
+        return self.transaction(AssetTransaction.CHECK_IN)
+
+    def check_out(self):
+        return self.transaction(AssetTransaction.CHECK_OUT)
+
+    def loan(self, to):
+        return self.transaction(AssetTransaction.LOAN, to)
+
+    def unknown(self):
+        return self.transaction(AssetTransaction.UNKNOWN)
+
+    def remove(self):
+        return self.transaction(AssetTransaction.REMOVED)
+
+
+
 class AssetTransaction(models.Model):
     """
     AssetTransaction model.
     """
+    #  Transaction
     UNKNOWN = 0
     CHECK_IN = 1
     CHECK_OUT = 2
-    LOAD = 3
+    LOAN = 3
     REMOVED = 4
 
     TRANSACTION_CHOICES = (
+        (UNKNOWN, 'Unknown'),
         (CHECK_IN, 'In Inventory'),
         (CHECK_OUT, 'Checked Out'),
-        (LOAD, 'Loaned'),
-        (UNKNOWN, 'Unknown'),
+        (LOAN, 'Loaned'),
         (REMOVED, 'Removed from Inventory Permanently'))
+
     asset = models.ForeignKey(MovieAsset)
-    trans = models.IntegerField(choices=TRANSACTION_CHOICES, default=CHECK_IN)
-    note = models.CharField(max_length=256, blank=True)
+    trans = models.IntegerField(choices=TRANSACTION_CHOICES, default=UNKNOWN)
+    note = models.CharField(max_length=256, blank=True, null=True)
     ts = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         idx, desc = self.TRANSACTION_CHOICES[self.trans]
         return "%s: %s" % (self.asset, desc)
+
+

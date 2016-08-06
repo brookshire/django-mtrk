@@ -40,24 +40,63 @@ class MovieAssetTests(TestCase):
 
         for a in self.assets:
             tr = AssetTransaction.objects.create(asset=a, trans=AssetTransaction.CHECK_IN)
-            print("%s is %s" % (a, a.status))
+            # print("%s is %s" % (a, a.status))
             self.assertEqual(AssetTransaction.CHECK_IN, a.status)
             self.assertEqual(default_trans_str, a.status_str)
 
     def test_all_asset_transactions(self):
         for a in self.assets:
+
+            # Check In
             tr = a.check_in()
             self.assertEqual(a.status, AssetTransaction.CHECK_IN)
-            print(tr)
+            self.assertEqual(a.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.CHECK_IN][1])
+            self.assertEqual(tr.trans, AssetTransaction.CHECK_IN)
+            self.assertEqual(tr.asset.status, AssetTransaction.CHECK_IN)
+            self.assertEqual(tr.asset.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.CHECK_IN][1])
+
+            # Check Out
             tr = a.check_out()
             self.assertEqual(a.status, AssetTransaction.CHECK_OUT)
+            self.assertEqual(a.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.CHECK_OUT][1])
+            self.assertEqual(tr.trans, AssetTransaction.CHECK_OUT)
+            self.assertEqual(tr.asset.status, AssetTransaction.CHECK_OUT)
+            self.assertEqual(tr.asset.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.CHECK_OUT][1])
+
+            # Loan
             tr = a.loan("Tester")
             self.assertEqual(a.status, AssetTransaction.LOAN)
             self.assertEqual(tr.note, "Tester")
-            a.unknown()
+            self.assertEqual(a.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.LOAN][1])
+            self.assertEqual(tr.trans, AssetTransaction.LOAN)
+            self.assertEqual(tr.asset.status, AssetTransaction.LOAN)
+            self.assertEqual(tr.asset.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.LOAN][1])
+
+            # Unknown
+            tr = a.unknown()
             self.assertEqual(a.status, AssetTransaction.UNKNOWN)
-            a.remove()
+            self.assertEqual(a.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.UNKNOWN][1])
+            self.assertEqual(tr.trans, AssetTransaction.UNKNOWN)
+            self.assertEqual(tr.asset.status, AssetTransaction.UNKNOWN)
+            self.assertEqual(tr.asset.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.UNKNOWN][1])
+
+            # Remove
+            tr = a.remove()
             self.assertEqual(a.status, AssetTransaction.REMOVED)
+            self.assertEqual(a.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.REMOVED][1])
+            self.assertEqual(tr.trans, AssetTransaction.REMOVED)
+            self.assertEqual(tr.asset.status, AssetTransaction.REMOVED)
+            self.assertEqual(tr.asset.status_str,
+                             AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.REMOVED][1])
 
     def test_site_home_content(self):
         request = HttpRequest()
