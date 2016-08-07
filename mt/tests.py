@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from .models import MovieAsset, AssetTransaction
+from .models import Asset, AssetTransaction
 from .views import home_page
 
 class MovieAssetTests(TestCase):
@@ -27,9 +27,9 @@ class MovieAssetTests(TestCase):
                                                last_name='User')
 
         self.assets = []
-        self.assets.append(MovieAsset.objects.create(title="FooBar Baz in America",
-                                                     barcode="123456789012",
-                                                     created_by=self.normal_user))
+        self.assets.append(Asset.objects.create(title="FooBar Baz in America",
+                                                barcode="123456789012",
+                                                created_by=self.normal_user))
 
 
     def test_default_instance_creation(self):

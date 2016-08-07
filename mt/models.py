@@ -4,7 +4,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
-class MovieAsset(models.Model):
+class Asset(models.Model):
     """
     Movie Asset model.
     """
@@ -81,7 +81,7 @@ class AssetTransaction(models.Model):
         (LOAN, 'Loaned'),
         (REMOVED, 'Removed from Inventory Permanently'))
 
-    asset = models.ForeignKey(MovieAsset)
+    asset = models.ForeignKey(Asset)
     trans = models.IntegerField(choices=TRANSACTION_CHOICES, default=UNKNOWN)
     note = models.CharField(max_length=256, blank=True, null=True)
     ts = models.DateTimeField(auto_now_add=True)
