@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.core.urlresolvers import resolve
 from django.http import HttpRequest
 from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 from .models import MovieAsset, AssetTransaction
@@ -16,9 +17,20 @@ class MovieAssetTests(TestCase):
         """
         Create a few sample assets to use for testing below.
         """
+        self.admin_user = User.objects.create(username='admin',
+                                              first_name='Administrator',
+                                              last_name='User',
+                                              is_staff=True)
+        self.normal_user = User.objects.create(username='newuser',
+                                               is_staff=False,
+                                               first_name='Normal',
+                                               last_name='User')
+
         self.assets = []
         self.assets.append(MovieAsset.objects.create(title="FooBar Baz in America",
-                                                     barcode="123456789012"))
+                                                     barcode="123456789012",
+                                                     created_by=self.normal_user))
+
 
     def test_default_instance_creation(self):
         """
@@ -34,6 +46,7 @@ class MovieAssetTests(TestCase):
             default_status_id, default_status_str = AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.UNKNOWN]
             self.assertEqual(default_status_id, a.status)
             self.assertEqual(default_status_str, a.status_str)
+            self.assertEqual(self.normal_user, a.created_by)
 
     def test_default_asset_transaction(self):
         idx, default_trans_str = AssetTransaction.TRANSACTION_CHOICES[AssetTransaction.CHECK_IN]

@@ -2,6 +2,7 @@
 #  Copyright (C) 2016 David Brookshire <dave@brookshire.org>
 #
 from django.db import models
+from django.contrib.auth.models import User, Group
 
 class MovieAsset(models.Model):
     """
@@ -16,6 +17,7 @@ class MovieAsset(models.Model):
     image_url_lg = models.URLField(blank=True)
     added = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
         return self.title
