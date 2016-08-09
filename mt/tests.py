@@ -12,6 +12,8 @@ from django.test import TestCase
 from .models import Asset, AssetTransaction
 from .views import home_page
 
+import os
+
 class MovieAssetTests(TestCase):
     def setUp(self):
         """
@@ -31,6 +33,10 @@ class MovieAssetTests(TestCase):
                                                 barcode="123456789012",
                                                 created_by=self.normal_user))
 
+
+    def test_output_env(self):
+        for x in os.environ.keys():
+            print("%s = %s" % (x, os.environ[x]))
 
     def test_default_instance_creation(self):
         """
