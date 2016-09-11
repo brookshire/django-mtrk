@@ -1,8 +1,75 @@
-from amazon.api import AmazonAPI
-
 import json
 
-if __name__ == '__main__':
+from amazon.api import AmazonAPI
+
+
+class ProductInformation:
+    title = None
+    small_img = None
+    medium_img = None
+    large_img = None
+    actors = None
+    model = None
+    author = None
+    authors = None
+    binding = None
+    brand = None
+    directors = None
+    editorial_reviews = None
+    genre = None
+    features = None
+    url = None
+    list_price = None
+    publication_date = None
+    release_date = None
+    sales_rank = None
+    api_filled = False
+
+    def __init__(self, sku):
+        access_key, secret_key, associate_tag = get_config()
+        self.sku = sku
+        self.get_product_information()
+
+    def __repr__(self):
+        ret = "Unknown (%s)" % self.sku
+
+        if self.title:
+            ret = "%s (%s)" % (self.title, self.sku)
+
+        # ret += " Field: [%s]" % self.foo
+
+        return ret
+
+    def get_product_information(self):
+        access_key, secret_key, associate_tag = get_config()
+
+        amz = AmazonAPI(access_key,
+                        secret_key,
+                        associate_tag)
+
+        response = amz.lookup(IdType="UPC", ItemId="%s" % self.sku, SearchIndex="All")
+        self.title = response.title
+        self.small_img = response.small_image_url
+        self.medium_img = response.medium_image_url
+        self.large_img = response.large_image_url
+        self.actors = response.actors
+        self.asin = response.asin
+        self.model = response.model
+        self.binding = response.binding
+        self.brand = response.brand
+        self.directors = response.directors
+        self.editorial_reviews = response.editorial_reviews
+        self.genre = response.genre
+        self.features = response.features
+        self.url = response.offer_url
+        self.list_price = response.list_price
+        self.publication_date = response.publication_date
+        self.release_date = response.release_date
+        self.sales_rank = response.sales_rank
+        self.api_filled = True
+
+
+def get_config():
     cfp = open("/etc/amazon.json", 'r')
     config = json.load(cfp)
     cfp.close()
@@ -11,21 +78,9 @@ if __name__ == '__main__':
     secret_key = config["secret_key"]
     associate_tag = config["associate_tag"]
 
+    return (access_key, secret_key, associate_tag)
 
-    print(access_key)
-    print(secret_key)
-    print(associate_tag)
-    amz = AmazonAPI(access_key,
-                    secret_key,
-                    associate_tag)
 
-    # response = amz.item_search(host="us",
-    #                        IdType="ISBN",
-    #                        ItemId="883929115488",
-    #                        ResponseGroup="ItemAttributes,Images")
-
-    try:
-        response = amz.lookup(ItemId="B00EOE0WKQ")
-        print(response)
-    except Exception as e:
-        print(e.url)
+if __name__ == '__main__':
+    p = ProductInformation("883929115488")
+    print(p)
