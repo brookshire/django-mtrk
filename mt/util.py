@@ -20,6 +20,7 @@ class ProductInformation:
     features = None
     url = None
     list_price = None
+    currency = None
     publication_date = None
     release_date = None
     sales_rank = None
@@ -62,7 +63,7 @@ class ProductInformation:
         self.genre = response.genre
         self.features = response.features
         self.url = response.offer_url
-        self.list_price = response.list_price
+        self.list_price, self.currency = response.list_price
         self.publication_date = response.publication_date
         self.release_date = response.release_date
         self.sales_rank = response.sales_rank

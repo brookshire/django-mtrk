@@ -21,6 +21,7 @@ class Asset(models.Model):
     title = models.CharField(max_length=256, blank=False)
     list_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    currency = models.CharField(max_length=24, blank=True)
     small_img = models.URLField(blank=True)
     medium_img = models.URLField(blank=True)
     large_img = models.URLField(blank=True)
@@ -41,8 +42,12 @@ class Asset(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, null=True)
 
+    api_fields = ['list_price', 'features', 'binding', 'sales_rank', 'asin', 'title', 'brand', \
+                  'price', 'publication_date', 'medium_img', 'url', 'release_date', 'large_img',
+                  'small_img', 'model', 'currency']
+
     def __unicode__(self):
-        return self.title
+        return "%s (%s)" % (self.title, self.upc)
 
     @property
     def status(self):
@@ -67,6 +72,19 @@ class Asset(models.Model):
                                              trans=trans,
                                              note=note)
         return tr
+
+    def get_product_info(self, save_info=True):
+        p = ProductInformation(self.upc)
+        for k in self.api_fields:
+            if k in p.__dict__:
+                # print("Storing: %s" % p.__dict__[k])
+                # print(k)
+                # print(p.__dict__[k])
+                # print(type(p.__dict__[k]))
+                self.__dict__[k] = p.__dict__[k]
+
+        if save_info is True:
+            self.save()
 
     def check_in(self):
         return self.transaction(AssetTransaction.CHECK_IN)
