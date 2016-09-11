@@ -3,18 +3,40 @@
 #
 from django.db import models
 from django.contrib.auth.models import User, Group
+from .util import ProductInformation
+
+class Person(models.Model):
+    name = models.CharField(max_length=64)
+
+class Genre(models.Model):
+    name = models.CharField(max_length=64)
 
 class Asset(models.Model):
     """
     Movie Asset model.
     """
-    barcode = models.CharField(max_length=12, blank=True)
+    upc = models.CharField(max_length=12, blank=True)
+    asin = models.CharField(max_length=24, blank=True)
+
     title = models.CharField(max_length=256, blank=False)
     list_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    image_url_sm = models.URLField(blank=True)
-    image_url_med = models.URLField(blank=True)
-    image_url_lg = models.URLField(blank=True)
+    small_img = models.URLField(blank=True)
+    medium_img = models.URLField(blank=True)
+    large_img = models.URLField(blank=True)
+    actors = models.ManyToManyField(Person, related_name="ActorsRelated")
+    directors = models.ManyToManyField(Person, related_name="DirectorsRelated")
+    model = models.CharField(max_length=64, blank=True)
+    binding = models.CharField(max_length=64, blank=True)
+    brand = models.CharField(max_length=64, blank=True)
+    genre = models.ForeignKey(Genre, null=True)
+    features = models.CharField(max_length=64, blank=True)
+    url = models.URLField(blank=True)
+    publication_date = models.DateField(blank=True, null=True)
+    release_date = models.DateField(blank=True, null=True)
+    sales_rank = models.IntegerField(blank=True, null=True)
+    # editorial_reviews = response.editorial_reviews
+
     added = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, null=True)
