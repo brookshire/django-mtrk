@@ -1,41 +1,54 @@
 #
 #  Copyright (C) 2016 David Brookshire <dave@brookshire.org>
 #
-from django.db import models
+import sys
+
 from django.contrib.auth.models import User, Group
+from django.db import models
+
 from .util import ProductInformation
+
 
 class Person(models.Model):
     name = models.CharField(max_length=64)
+    director = models.BooleanField(default=False)
+    actor = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name
 
 class Genre(models.Model):
     name = models.CharField(max_length=64)
+
+    def __unicode__(self):
+        return self.name
 
 class Asset(models.Model):
     """
     Movie Asset model.
     """
     upc = models.CharField(max_length=12, blank=True)
-    asin = models.CharField(max_length=24, blank=True)
 
-    title = models.CharField(max_length=256, blank=False)
-    list_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    currency = models.CharField(max_length=24, blank=True)
-    small_img = models.URLField(blank=True)
-    medium_img = models.URLField(blank=True)
-    large_img = models.URLField(blank=True)
-    actors = models.ManyToManyField(Person, related_name="ActorsRelated")
-    directors = models.ManyToManyField(Person, related_name="DirectorsRelated")
-    model = models.CharField(max_length=64, blank=True)
-    binding = models.CharField(max_length=64, blank=True)
-    brand = models.CharField(max_length=64, blank=True)
+    asin = models.CharField(max_length=24, blank=True, null=True)
+    # actors = models.ManyToManyField(Person, related_name="ActorsRelated")
+    binding = models.CharField(max_length=64, blank=True, null=True)
+    brand = models.CharField(max_length=64, blank=True, null=True)
+    currency = models.CharField(max_length=24, blank=True, null=True)
+    # directors = models.ManyToManyField(Person, related_name="DirectorsRelated")
+    features = models.CharField(max_length=64, blank=True, null=True)
     genre = models.ForeignKey(Genre, null=True)
-    features = models.CharField(max_length=64, blank=True)
-    url = models.URLField(blank=True)
+    large_img = models.URLField(blank=True, null=True)
+    list_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    medium_img = models.URLField(blank=True, null=True)
+    model = models.CharField(max_length=64, blank=True, null=True)
+    price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)
     release_date = models.DateField(blank=True, null=True)
     sales_rank = models.IntegerField(blank=True, null=True)
+    small_img = models.URLField(blank=True, null=True)
+    title = models.CharField(max_length=256, blank=False)
+    url = models.URLField(blank=True, null=True)
+
     # editorial_reviews = response.editorial_reviews
 
     added = models.DateTimeField(auto_now_add=True)
@@ -48,6 +61,10 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.upc)
+
+    def save(self, *args, **kwargs):
+        self.title = self.title.title()
+        super(Asset, self).save(*args, **kwargs)
 
     @property
     def status(self):
@@ -82,6 +99,39 @@ class Asset(models.Model):
                 # print(p.__dict__[k])
                 # print(type(p.__dict__[k]))
                 self.__dict__[k] = p.__dict__[k]
+
+        if "genre" in p.__dict__:
+            name = p.__dict__["genre"]
+            if name is not None:
+                ng, created = Genre.objects.get_or_create(name=name)
+                if created:
+                    print("New genre added %s" % ng)
+                else:
+                    print("Existing genre noted %s" % ng)
+            else:
+                print("No genre recorded for %s" % self)
+
+        if "actors" in p.__dict__:
+            for a in p.__dict__["actors"]:
+                np, created = Person.objects.get_or_create(name=a)
+                np.actor = True
+                np.save()
+
+                if created:
+                    print("New person created for actor %s" % np)
+                else:
+                    print("Updated existing person as actor %s" % np)
+
+        if "directors" in p.__dict__:
+            for a in p.__dict__["directors"]:
+                np, created = Person.objects.get_or_create(name=a)
+                np.director = True
+                np.save()
+
+                if created:
+                    print("New person created for director %s" % np)
+                else:
+                    print("Updated existing person as director %s" % np)
 
         if save_info is True:
             self.save()

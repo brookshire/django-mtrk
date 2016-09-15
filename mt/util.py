@@ -1,4 +1,5 @@
 import json
+import sys
 
 from amazon.api import AmazonAPI
 
@@ -48,26 +49,46 @@ class ProductInformation:
                         secret_key,
                         associate_tag)
 
-        response = amz.lookup(IdType="UPC", ItemId="%s" % self.sku, SearchIndex="All")
-        self.title = response.title
-        self.small_img = response.small_image_url
-        self.medium_img = response.medium_image_url
-        self.large_img = response.large_image_url
-        self.actors = response.actors
+        response = amz.lookup(IdType="UPC", ItemId="%s" % self.sku, SearchIndex="Electronics")
+
+        if type(response) is list:
+            # If more than one response was found, return the first.
+            response = response[0]
+
         self.asin = response.asin
-        self.model = response.model
+        self.actors = response.actors
         self.binding = response.binding
         self.brand = response.brand
         self.directors = response.directors
         self.editorial_reviews = response.editorial_reviews
-        self.genre = response.genre
         self.features = response.features
-        self.url = response.offer_url
-        self.list_price, self.currency = response.list_price
+        self.genre = response.genre
+        self.large_img = response.large_image_url
+        self.medium_img = response.medium_image_url
+        self.model = response.model
         self.publication_date = response.publication_date
         self.release_date = response.release_date
         self.sales_rank = response.sales_rank
+        self.small_img = response.small_image_url
+        self.title = response.title
+        self.url = response.offer_url
+
+        self.list_price, self.currency = response.list_price
+        if self.list_price is None:
+            self.list_price = 0.00
+
+        if self.currency is None:
+            self.currency = "USD"
+
         self.api_filled = True
+
+
+def get_or_fix_reponse_value(response, pname):
+    ret = None
+    if response.__getattribute__(pname):
+        ret = response.__getattribute__(pname)
+
+    return ret
 
 
 def get_config():
