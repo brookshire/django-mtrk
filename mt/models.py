@@ -35,7 +35,7 @@ class Asset(models.Model):
     brand = models.CharField(max_length=64, blank=True, null=True)
     currency = models.CharField(max_length=24, blank=True, null=True)
     # directors = models.ManyToManyField(Person, related_name="DirectorsRelated")
-    features = models.CharField(max_length=64, blank=True, null=True)
+    features = models.CharField(max_length=512, blank=True, null=True)
     genre = models.ForeignKey(Genre, null=True)
     large_img = models.URLField(blank=True, null=True)
     list_price = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
@@ -104,6 +104,8 @@ class Asset(models.Model):
             name = p.__dict__["genre"]
             if name is not None:
                 ng, created = Genre.objects.get_or_create(name=name)
+                self.genre = ng
+                self.save()
                 if created:
                     print("New genre added %s" % ng)
                 else:
