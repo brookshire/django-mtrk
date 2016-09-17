@@ -16,14 +16,14 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from mt import views
 
 urlpatterns = [
     url(r'^$', views.home_page),
     url(r'^admin/', admin.site.urls),
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework'))
-
+    url(r'^mtrk/', include('mt.urls', namespace='mtrk'))
+    # url(r'^api-auth/', include('rest_framework.urls',
+    #                            namespace='rest_framework'))
 ]
