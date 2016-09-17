@@ -1,0 +1,8 @@
+bottlenose
+Django
+djangorestframework
+lxml
+python-amazon-product-api
+python-amazon-simple-product-api
+python-dateutil
+pyxattr
