@@ -72,7 +72,7 @@ class Asset(models.Model):
         Determine the current state of this asset based on transaction records.
         :return: The last transaction's code, or unknown if no transactions have been recorded.
         """
-        records = AssetTransaction.objects.all()
+        records = AssetTransaction.objects.all().filter(asset=self)
         record_count = len(records)
         if record_count > 0:
             return records[record_count-1].trans
@@ -176,6 +176,7 @@ class AssetTransaction(models.Model):
     asset = models.ForeignKey(Asset)
     trans = models.IntegerField(choices=TRANSACTION_CHOICES, default=UNKNOWN)
     note = models.CharField(max_length=256, blank=True, null=True)
+    user = models.ForeignKey(User)
     ts = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

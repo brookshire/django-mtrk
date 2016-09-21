@@ -41,8 +41,14 @@ class AssetAdmin(admin.ModelAdmin):
         }),
     )
 
+@admin.register(AssetTransaction)
+class AssetTransactionAdmin(admin.ModelAdmin):
+    list_display = ('ts', 'user', 'asset', 'trans', 'note')
+    # date_hierarchy = ['ts']
+    # list_filter = ('trans')
+    # ordering = ('ts',)
 
 # admin.site.register(Asset)
-admin.site.register(AssetTransaction)
+#admin.site.register(AssetTransaction)
 admin.site.register(Person)
 admin.site.register(Genre)

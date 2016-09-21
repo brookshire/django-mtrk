@@ -47,8 +47,10 @@ class Command(BaseCommand):
 
                     loaded.append(upc)
 
+                    # print("===>>>> %s" % na.status_str)
                     if na.status != AssetTransaction.CHECK_IN:
                         nt = AssetTransaction.objects.create(asset=na,
+                                                             user=u,
                                                              trans=AssetTransaction.CHECK_IN,
                                                              note="Added by bulk_add command")
                         print("Checked %s into inventory" % na)
