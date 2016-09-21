@@ -17,6 +17,13 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def imdb_search_url(self):
+        name_parts = self.name.split()
+        name_str = "+".join(name_parts)
+        url = "http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=%s" % name_str
+        return url
+
 class Genre(models.Model):
     name = models.CharField(max_length=64)
 

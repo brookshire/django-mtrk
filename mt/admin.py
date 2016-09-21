@@ -48,7 +48,11 @@ class AssetTransactionAdmin(admin.ModelAdmin):
     # list_filter = ('trans')
     # ordering = ('ts',)
 
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'imdb_search_url', 'actor', 'director')
+
 # admin.site.register(Asset)
-#admin.site.register(AssetTransaction)
-admin.site.register(Person)
+# admin.site.register(AssetTransaction)
+# dmin.site.register(Person)
 admin.site.register(Genre)
